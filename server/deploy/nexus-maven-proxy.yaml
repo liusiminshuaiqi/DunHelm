@@ -1,0 +1,117 @@
+# DunHelm 构建依赖缓存代理（方案B：Nexus3）
+# 部署到「构建集群」的 dunhelm-ci 命名空间（与构建 Pod 同 namespace，内网 DNS 最简：
+#   nexus.dunhelm-ci.svc.cluster.local:8081）。
+#
+# 为什么需要它：构建集群没有 RWX 存储，无法用单块共享 PVC 跨节点缓存；改用
+# 「节点本地盘(hostPath) + Nexus 代理」的分层缓存（对标 KubeSphere 生产做法）：
+#   1) 节点本地盘（引擎已挂 /opt/dunhelm-m2 → 节点 /var/lib/dunhelm/m2-cache）：同节点构建直接命中，最快；
+#   2) Nexus（本文件部署）：冷节点首次构建走内网 Nexus 拉取，Nexus 自己用 PVC 持久化，
+#      不再打外网；且代理原生处理并发锁，2-3 条并行构建安全；
+#   3) 中央仓库 / 阿里 / 用友私服：仅 Nexus 回源时兜底。
+#
+# 部署后还需在 Nexus 里创建以下仓库（用 admin 登录 Web UI 或 Script API）：
+#   - maven-central   : type=proxy,     remote=https://repo1.maven.org/maven2/
+#   - aliyun-proxy    : type=proxy,     remote=https://maven.aliyun.com/repository/public
+#   - yongyou-proxy   : type=proxy,     remote=http://139.159.177.154:8501/repository/maven-public/
+#                       （用友私服需认证：在 Nexus 该 proxy 仓库的「Authentication」填用友账号/密码）
+#   - maven-group     : type=group,     members=[maven-central, aliyun-proxy, yongyou-proxy]（顺序即优先级）
+# 然后构建的全局 settings.xml 把 mirror 指向 maven-group（见 DunHelm「平台治理→构建配置」）。
+#
+# 初始 admin 密码：kubectl -n dunhelm-ci exec deploy/nexus -- cat /nexus-data/admin.password
+# 默认匿名用户有 maven-group 的读取权限；如需关闭匿名读取，在 Nexus Security 配置。
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dunhelm-ci
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nexus-data
+  namespace: dunhelm-ci
+spec:
+  accessModes:
+    - ReadWriteOnce          # Nexus 单副本，RWO 即可（无需 RWX）
+  resources:
+    requests:
+      storage: 20Gi          # 按依赖体量调整；Nexus blob 默认落这里
+  # storageClassName: ""     # 留空=用集群默认 StorageClass；如默认非 RWO 可显式指定
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexus
+  namespace: dunhelm-ci
+  labels:
+    app: nexus
+    dunhelm.io/managed: kubehelm-ci
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nexus
+  template:
+    metadata:
+      labels:
+        app: nexus
+        dunhelm.io/managed: kubehelm-ci
+    spec:
+      containers:
+        - name: nexus
+          image: sonatype/nexus3:3.79.0
+          ports:
+            - containerPort: 8081
+              name: http
+          env:
+            # 初次启动生成随机 admin 密码并写入 /nexus-data/admin.password（用 kubectl exec 读取）
+            - name: NEXUS_SECURITY_RANDOMPASSWORD
+              value: "true"
+            - name: INSTALL4J_ADD_VM_PARAMS
+              value: "-Xms1g -Xmx2g -XX:MaxDirectMemorySize=1g"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+          volumeMounts:
+            - name: data
+              mountPath: /nexus-data
+          # Nexus 启动较慢（1~2 分钟），探针放宽初始延迟，避免被误杀
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: 180
+            periodSeconds: 20
+            failureThreshold: 6
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: nexus-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus
+  namespace: dunhelm-ci
+  labels:
+    app: nexus
+    dunhelm.io/managed: kubehelm-ci
+spec:
+  type: ClusterIP
+  selector:
+    app: nexus
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081

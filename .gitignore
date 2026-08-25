@@ -1,0 +1,31 @@
+# ===== 运行时数据库 / 日志 / 二进制（含敏感信息，切勿提交）=====
+*.db
+*.sqlite
+*.sqlite3
+*.log
+kubehelm-server
+kubehelm-server.log
+.dunhelm-*.log
+
+# ===== 本地工作数据 =====
+.workbuddy/
+.dunhelm-frontend.log
+.dunhelm-backend.log
+
+# ===== 构建产物 / 缓存 =====
+node_modules/
+dist/
+dist_bak/
+.vite/
+build/
+*.local
+
+# ===== 操作系统文件 =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== 编辑器 / IDE =====
+.idea/
+.vscode/
+*.swp

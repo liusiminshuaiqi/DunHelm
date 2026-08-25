@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sidebar-w: 232px;
+  --topbar-h: 56px;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html, body, #root { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+    background: #F5F8FC;
+    color: #0C1727;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+}
+
+/* ===== 滚动条 ===== */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb {
+  background: #CBD6E5; border-radius: 8px;
+  border: 2px solid transparent; background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: #A9B8CC; background-clip: content-box; }
+::-webkit-scrollbar-track { background: transparent; }
+
+@layer components {
+  /* 26px 科技网格底纹 */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(19,96,196,.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(19,96,196,.05) 1px, transparent 1px);
+    background-size: 26px 26px;
+  }
+  /* 页面顶部径向蓝色光晕 */
+  .top-aura::before {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(120% 60% at 18% -10%, rgba(36,120,232,.10), transparent 60%),
+      radial-gradient(90% 50% at 88% -15%, rgba(6,182,212,.08), transparent 55%);
+  }
+  /* 卡片顶部 brand→cyan 渐变光条（内缩、渐隐，贴近设计稿） */
+  .card-beam {
+    position: relative; overflow: hidden;
+  }
+  .card-beam::before {
+    content: ""; position: absolute; top: 0; left: 14px; right: 14px; height: 1px;
+    background: linear-gradient(90deg, transparent, #8CBBF7, #22D3EE, transparent);
+    opacity: .85;
+  }
+  /* 镜像仓库卡片：hover 才显示顶部光条 */
+  .repo-beam { position: relative; overflow: hidden; }
+  .repo-beam::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, #06B6D4, #1360C4); opacity: 0; transition: opacity .25s ease;
+  }
+  .repo-beam:hover::before { opacity: 1; }
+  /* hover 时蓝色发光描边 */
+  .hover-glow { transition: box-shadow .2s ease, transform .2s ease; }
+  .hover-glow:hover { box-shadow: 0 0 0 1px rgba(36,120,232,.14), 0 8px 28px -10px rgba(36,120,232,.38); }
+
+  /* 运行态流光进度条 */
+  .flow-track {
+    position: relative; overflow: hidden; background: #EFF4FA; border-radius: 999px;
+  }
+  .flow-fill {
+    position: absolute; inset: 0; width: var(--p, 50%);
+    background: linear-gradient(90deg, #1360C4, #06B6D4);
+    border-radius: 999px;
+  }
+  .flow-fill::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+    transform: translateX(-100%); animation: shimmer 1.6s infinite;
+  }
+}
+
+@layer utilities {
+  .rise-1 { animation: rise .5s cubic-bezier(.22,1,.36,1) both .04s; }
+  .rise-2 { animation: rise .5s cubic-bezier(.22,1,.36,1) both .10s; }
+  .rise-3 { animation: rise .5s cubic-bezier(.22,1,.36,1) both .16s; }
+  .rise-4 { animation: rise .5s cubic-bezier(.22,1,.36,1) both .22s; }
+  .rise-5 { animation: rise .5s cubic-bezier(.22,1,.36,1) both .28s; }
+  .rise-6 { animation: rise .5s cubic-bezier(.22,1,.36,1) both .34s; }
+}
