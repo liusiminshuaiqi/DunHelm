@@ -89,13 +89,13 @@ DunHelm 采用前后端分离、单仓库（mono-repo）结构：
 | --- | --- |
 | ![配置](screenshots/config.png) | ![流水线](screenshots/pipelines.png) |
 
-| 构建配置 | 镜像仓库 |
+| 镜像仓库 | 应用商店 |
 | --- | --- |
-| ![构建配置](screenshots/buildconfig.png) | ![镜像仓库](screenshots/registry.png) |
+| ![镜像仓库](screenshots/registry.png) | ![应用商店](screenshots/market.png) |
 
-| 应用商店 | 代码凭证 |
+| 代码凭证 | 企业空间 |
 | --- | --- |
-| ![应用商店](screenshots/market.png) | ![代码凭证](screenshots/credentials.png) |
+| ![代码凭证](screenshots/credentials.png) | ![企业空间](screenshots/workspaces.png) |
 
 | 企业空间 | 用户与角色 |
 | --- | --- |
