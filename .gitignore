@@ -9,6 +9,7 @@ kubehelm-server.log
 
 # ===== 本地工作数据 =====
 .workbuddy/
+design/
 .dunhelm-frontend.log
 .dunhelm-backend.log
 

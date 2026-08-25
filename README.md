@@ -69,6 +69,44 @@ DunHelm 采用前后端分离、单仓库（mono-repo）结构：
 
 ---
 
+## 系统截图
+
+> 以下截图均来自真实运行的 DunHelm 实例（管理员视角），覆盖从登录、集群总览到 DevOps 与平台治理的主要界面。
+
+| 登录页 | 集群总览 |
+| --- | --- |
+| ![登录页](screenshots/login.png) | ![集群总览](screenshots/overview.png) |
+
+| 工作负载 | 集群节点 |
+| --- | --- |
+| ![工作负载](screenshots/workloads.png) | ![集群节点](screenshots/nodes.png) |
+
+| 存储卷 | 网络 |
+| --- | --- |
+| ![存储卷](screenshots/storage.png) | ![网络](screenshots/network.png) |
+
+| 配置 (ConfigMap) | 流水线 |
+| --- | --- |
+| ![配置](screenshots/config.png) | ![流水线](screenshots/pipelines.png) |
+
+| 构建配置 | 镜像仓库 |
+| --- | --- |
+| ![构建配置](screenshots/buildconfig.png) | ![镜像仓库](screenshots/registry.png) |
+
+| 应用商店 | 代码凭证 |
+| --- | --- |
+| ![应用商店](screenshots/market.png) | ![代码凭证](screenshots/credentials.png) |
+
+| 企业空间 | 用户与角色 |
+| --- | --- |
+| ![企业空间](screenshots/workspaces.png) | ![用户与角色](screenshots/users.png) |
+
+| 审计日志 | 集群管理 |
+| --- | --- |
+| ![审计日志](screenshots/audit.png) | ![集群管理](screenshots/clusters.png) |
+
+---
+
 ## 三、技术栈
 
 | 层 | 技术 |
